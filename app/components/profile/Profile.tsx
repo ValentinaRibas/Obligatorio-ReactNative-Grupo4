@@ -3,13 +3,13 @@ import {
   View,
   Text,
   Image,
-  TextInput,
-  Button,
-  FlatList,
   TouchableOpacity,
   StyleSheet,
-  Alert,
+  FlatList,
   Modal,
+  Alert,
+  TextInput,
+  Dimensions,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 
@@ -19,7 +19,7 @@ interface ProfileProps {
   currentUserId: string;
 }
 
-const BASE_URL = "http://192.168.1.21:3001";
+const BASE_URL = "http://10.13.27.128:3001";
 
 const Profile: React.FC<ProfileProps> = ({ userId, token, currentUserId }) => {
   const [user, setUser] = useState<{
@@ -27,8 +27,7 @@ const Profile: React.FC<ProfileProps> = ({ userId, token, currentUserId }) => {
     username: string;
     description: string;
     profilePicture: string;
-    followers: number;
-    following: number;
+    posts: string[];
     friends: string[];
   } | null>(null);
 
@@ -52,7 +51,11 @@ const Profile: React.FC<ProfileProps> = ({ userId, token, currentUserId }) => {
   const [selectedPost, setSelectedPost] = useState<(typeof photos)[0] | null>(
     null
   );
-  const [isFriend, setIsFriend] = useState(false);
+
+  const numColumns = 3;
+  const { width } = Dimensions.get("window");
+  const itemSpacing = 3;
+  const photoSize = (width - (numColumns + 1) * itemSpacing) / numColumns;
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -66,15 +69,12 @@ const Profile: React.FC<ProfileProps> = ({ userId, token, currentUserId }) => {
           const data = await response.json();
           setUser({
             ...data.user,
-            followers: 1200,
-            following: 350,
+            posts: data.posts.length,
+            friends: data.user.friends.length,
           });
           setUsername(data.user.username);
           setDescription(data.user.description);
           setProfilePic(data.user.profilePicture);
-          setIsFriend(data.user.friends.includes(currentUserId));
-        } else {
-          console.error("Error fetching profile data");
         }
       } catch (error) {
         console.error("Error fetching profile data:", error);
@@ -103,6 +103,10 @@ const Profile: React.FC<ProfileProps> = ({ userId, token, currentUserId }) => {
             profileImage: post.user.profilePicture,
           }));
           setPhotos(imageUrls);
+
+          setUser((prevUser) =>
+            prevUser ? { ...prevUser, posts: userPosts.length } : prevUser
+          );
         } else {
           console.error("Error fetching posts");
         }
@@ -114,50 +118,6 @@ const Profile: React.FC<ProfileProps> = ({ userId, token, currentUserId }) => {
     fetchUserData();
     fetchUserPosts();
   }, [userId, token, currentUserId]);
-
-  const handleAddFriend = async () => {
-    try {
-      const response = await fetch(
-        `${BASE_URL}/api/user/add-friend/${userId}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (response.ok) {
-        setIsFriend(true);
-      } else {
-        console.error("Error adding friend");
-      }
-    } catch (error) {
-      console.error("Error adding friend:", error);
-    }
-  };
-
-  const handleRemoveFriend = async () => {
-    try {
-      const response = await fetch(
-        `${BASE_URL}/api/user/remove-friend/${userId}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (response.ok) {
-        setIsFriend(false);
-      } else {
-        console.error("Error removing friend");
-      }
-    } catch (error) {
-      console.error("Error removing friend:", error);
-    }
-  };
 
   const handleEditClick = () => setIsEditing(true);
 
@@ -227,40 +187,103 @@ const Profile: React.FC<ProfileProps> = ({ userId, token, currentUserId }) => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={handleImagePicker}>
-        <Image
-          source={{ uri: profilePic || "https://via.placeholder.com/150" }}
-          style={styles.profileImage}
-        />
-      </TouchableOpacity>
-      <View style={styles.detailsContainer}>
-        {isEditing ? (
-          <TextInput
-            style={styles.input}
-            value={username}
-            onChangeText={setUsername}
-          />
-        ) : (
-          <Text style={styles.username}>{username}</Text>
-        )}
-        <Button
-          title={isEditing ? "Save" : "Edit Profile"}
-          onPress={() => setIsEditing(!isEditing)}
-        />
-        <Text style={styles.stats}>{`${photos.length} posts`}</Text>
-        <Text style={styles.stats}>{`Followers: ${user.followers}`}</Text>
-        <Text style={styles.stats}>{`Following: ${user.following}`}</Text>
+      <View style={styles.header}>
+        <View style={styles.leftColumn}>
+          <TouchableOpacity onPress={handleImagePicker}>
+            <Image
+              source={{
+                uri:
+                  profilePic ||
+                  user.profilePicture ||
+                  "https://via.placeholder.com/150",
+              }}
+              style={styles.profileImage}
+            />
+          </TouchableOpacity>
+          {isEditing ? (
+            <TextInput
+              style={styles.input}
+              value={username}
+              onChangeText={setUsername}
+            />
+          ) : (
+            <Text style={styles.username}>{user.username}</Text>
+          )}
+          {isEditing ? (
+            <TextInput
+              style={styles.input}
+              value={description}
+              onChangeText={setDescription}
+            />
+          ) : (
+            <Text style={styles.description}>
+              {user.description || "No bio available"}
+            </Text>
+          )}
+        </View>
+        <View style={styles.rightColumn}>
+          <Text style={styles.stat}>
+            <Text style={styles.bold}>{user.posts || 0}</Text> Posts
+          </Text>
+          <Text style={styles.stat}>
+            <Text style={styles.bold}>{user.friends || 0}</Text> Friends
+          </Text>
+        </View>
       </View>
+
+      <TouchableOpacity
+        style={styles.editButton}
+        onPress={isEditing ? handleSaveClick : handleEditClick}
+      >
+        <Text style={styles.editButtonText}>
+          {isEditing ? "Save" : "Edit Profile"}
+        </Text>
+      </TouchableOpacity>
 
       <FlatList
         data={photos}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => handleOpenModal(item)}>
-            <Image source={{ uri: item.imageUrl }} style={styles.photo} />
-          </TouchableOpacity>
-        )}
-        numColumns={3}
+        numColumns={1}
+        contentContainerStyle={{ padding: itemSpacing / 2 }}
+        renderItem={({ item, index }) => {
+          if (index % numColumns === 0) {
+            return (
+              <View
+                style={{
+                  flexDirection: "row",
+                  marginVertical: itemSpacing / 2,
+                }}
+              >
+                {[item, photos[index + 1], photos[index + 2]].map(
+                  (photo, rowIndex) =>
+                    photo && (
+                      <View
+                        key={photo.id}
+                        style={{
+                          flex: 1 / numColumns,
+                          marginHorizontal: itemSpacing / 2,
+                        }}
+                      >
+                        <TouchableOpacity
+                          onPress={() => handleOpenModal(photo)}
+                        >
+                          <Image
+                            source={{ uri: photo.imageUrl }}
+                            style={{
+                              flex: 1,
+                              aspectRatio: 1,
+                              resizeMode: "cover",
+                            }}
+                          />
+                        </TouchableOpacity>
+                      </View>
+                    )
+                )}
+              </View>
+            );
+          }
+          return null;
+        }}
       />
 
       <Modal visible={isModalOpen} transparent={true}>
@@ -287,27 +310,88 @@ const Profile: React.FC<ProfileProps> = ({ userId, token, currentUserId }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  profileImage: { width: 150, height: 150, borderRadius: 75, marginBottom: 20 },
-  detailsContainer: { alignItems: "center" },
-  username: { fontSize: 24, fontWeight: "bold" },
+  container: { flex: 1, backgroundColor: "#fff" },
+  header: {
+    flexDirection: "row",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    alignItems: "center",
+  },
+  leftColumn: {
+    alignItems: "flex-start",
+    flex: 1,
+  },
+  rightColumn: {
+    justifyContent: "center",
+    alignItems: "flex-end",
+    flex: 1,
+  },
+  profileImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 10,
+  },
+  username: {
+    fontSize: 20,
+    fontWeight: "bold",
+    textAlign: "left",
+  },
+  description: {
+    color: "#777",
+    marginVertical: 5,
+    textAlign: "left",
+  },
+  stat: {
+    fontSize: 14,
+    color: "#333",
+    marginBottom: 5,
+  },
+  bold: {
+    fontWeight: "bold",
+  },
+  editButton: {
+    // marginHorizontal: 20,
+    backgroundColor: "#f0f0f0",
+    paddingVertical: 12,
+    borderRadius: 5,
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  editButtonText: {
+    fontSize: 16,
+    color: "#000",
+  },
   input: {
     borderWidth: 1,
     borderColor: "#ccc",
     padding: 8,
-    marginVertical: 10,
-    width: "80%",
+    marginVertical: 5,
+    width: "100%",
   },
-  stats: { fontSize: 16, marginVertical: 2 },
-  photo: { width: 100, height: 100, margin: 5 },
+  photoGrid: {
+    paddingHorizontal: 0,
+  },
   modalContainer: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.5)",
     justifyContent: "center",
+    alignItems: "center",
   },
-  modalCloseButton: { alignSelf: "flex-end", margin: 10 },
-  modalCloseText: { color: "white", fontSize: 18 },
-  modalImage: { width: 300, height: 300, alignSelf: "center" },
+  modalCloseButton: {
+    position: "absolute",
+    top: 40,
+    right: 20,
+  },
+  modalCloseText: {
+    color: "white",
+    fontSize: 18,
+  },
+  modalImage: {
+    width: "90%",
+    height: "50%",
+    resizeMode: "contain",
+  },
 });
 
 export default Profile;
