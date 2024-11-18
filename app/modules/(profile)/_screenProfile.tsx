@@ -14,6 +14,7 @@ interface ScreenProfileProps {
 
 const ScreenProfile: React.FC<ScreenProfileProps> = ({ route }) => {
   const {
+    // userId = "672bfbe5aee61744734c9e64",
     userId = "6726e6ced7b7d6629802616b",
     token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3MjZlNmNlZDdiN2Q2NjI5ODAyNjE2YiIsImlhdCI6MTczMTcwNzg2NSwiZXhwIjoxNzM0Mjk5ODY1fQ.Z880IWyG8cjPbpKewiqKHktlOHWnNqNruej4rAMAh-w",
     currentUserId = "6726e6ced7b7d6629802616b",

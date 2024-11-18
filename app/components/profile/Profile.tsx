@@ -123,9 +123,9 @@ const Profile: React.FC<ProfileProps> = ({ userId, token, currentUserId }) => {
 
   const handleSaveClick = async () => {
     const updatedData = {
-      username: username || user?.username,
-      description: description || user?.description,
-      profilePicture: profilePic || user?.profilePicture,
+      username: username,
+      description: description,
+      profilePicture: profilePic,
     };
 
     try {
@@ -143,32 +143,46 @@ const Profile: React.FC<ProfileProps> = ({ userId, token, currentUserId }) => {
       }
 
       const data = await response.json();
-      setUser({ ...user, ...data });
+
+      if (user) {
+        setUser({
+          ...user,
+          username: data.username ?? user.username,
+          description: data.description ?? user.description,
+          profilePicture: data.profilePicture ?? user.profilePicture,
+          posts: user.posts,
+          friends: user.friends,
+          _id: user._id,
+        });
+      }
+
       setIsEditing(false);
     } catch (error) {
-      console.error(error);
+      console.error("Error al actualizar el perfil:", error);
     }
   };
 
   const handleImagePicker = async () => {
     if (isEditing) {
-      const permissionResult =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (!permissionResult.granted) {
-        Alert.alert("Permission to access camera roll is required!");
-        return;
-      }
+      try {
+        const permissionResult =
+          await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (!permissionResult.granted) {
+          Alert.alert("Permission to access camera roll is required!");
+          return;
+        }
 
-      const pickerResult = await ImagePicker.launchImageLibraryAsync({
-        allowsEditing: true,
-        aspect: [1, 1],
-        base64: true,
-      });
+        const pickerResult = await ImagePicker.launchImageLibraryAsync({
+          allowsEditing: true,
+          aspect: [1, 1],
+          base64: false,
+        });
 
-      if (!pickerResult.canceled && pickerResult.assets) {
-        setProfilePic(
-          `data:image/jpeg;base64,${pickerResult.assets[0].base64}`
-        );
+        if (!pickerResult.canceled) {
+          setProfilePic(pickerResult.assets[0].uri);
+        }
+      } catch (error) {
+        console.error("Error opening gallery:", error);
       }
     }
   };
@@ -231,14 +245,25 @@ const Profile: React.FC<ProfileProps> = ({ userId, token, currentUserId }) => {
         </View>
       </View>
 
-      <TouchableOpacity
-        style={styles.editButton}
-        onPress={isEditing ? handleSaveClick : handleEditClick}
-      >
-        <Text style={styles.editButtonText}>
-          {isEditing ? "Save" : "Edit Profile"}
-        </Text>
-      </TouchableOpacity>
+      {userId === currentUserId ? (
+        <TouchableOpacity
+          style={styles.editButton}
+          onPress={isEditing ? handleSaveClick : handleEditClick}
+        >
+          <Text style={styles.editButtonText}>
+            {isEditing ? "Save" : "Edit Profile"}
+          </Text>
+        </TouchableOpacity>
+      ) : (
+        <TouchableOpacity
+          style={styles.editButton}
+          onPress={() => {
+            Alert.alert("Friend request sent!");
+          }}
+        >
+          <Text style={styles.editButtonText}>Add Friend</Text>
+        </TouchableOpacity>
+      )}
 
       <FlatList
         data={photos}
