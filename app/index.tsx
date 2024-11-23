@@ -1,26 +1,19 @@
-import { Image, StyleSheet, Platform, View } from 'react-native';
+import React from 'react';
+import Post from './components/feed/Post';
 
-export default function HomeScreen() {
+const Index = () => {
   return (
-    <View></View>
+    <Post
+      postId={1}
+      profileImage="https://militaryhealthinstitute.org/wp-content/uploads/sites/37/2021/08/blank-profile-picture-png.png"
+      username="Maria"
+      time="1 Nov"
+      image="https://camarasal.com/wp-content/uploads/2020/08/default-image-5-1.jpg"
+      caption="Descripción del post"
+      likes={33}
+      comments={[]}
+    />
   );
-}
+};
 
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
-});
+export default Index;
