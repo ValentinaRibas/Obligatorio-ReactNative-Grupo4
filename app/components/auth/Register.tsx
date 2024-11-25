@@ -7,15 +7,17 @@ import {
   StyleSheet,
   TextInput,
 } from "react-native";
+import { router } from 'expo-router';
+import { useSession } from "../context/ctx";
 
-import { useNavigation } from "@react-navigation/native";
 
 export default function Register() {
-  const navigation = useNavigation();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  
+  const { signIn } = useSession();
 
   useEffect(() => {
     if( !email || !password || !username ) {
@@ -37,9 +39,10 @@ export default function Register() {
           });
           if (response.ok) {
             const data = await response.json();
-            console.log(data)
             if (data.token) {
-              //navigation.navigate("Profile");
+              console.log(data);
+              signIn(JSON.stringify(data));
+              router.replace('/');
             } else {
               setError("Token faltante");
             }
@@ -90,6 +93,12 @@ export default function Register() {
         >
           <Text style={styles.buttonText}>Registro</Text>
         </TouchableOpacity>
+        <Text
+          onPress={() => {
+            router.replace('/login');
+          }}>
+          Logeate a tu cuenta clickeando aqui
+        </Text>
         {error && <Text style={styles.error}>{error}</Text>}
       </View>
     </View>

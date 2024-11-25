@@ -7,14 +7,15 @@ import {
   StyleSheet,
   TextInput,
 } from "react-native";
-
-import { useNavigation } from "@react-navigation/native";
+import { router } from 'expo-router';
+import { useSession } from "../context/ctx";
 
 export default function Login() {
-  const navigation = useNavigation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+
+  const { signIn } = useSession();
 
   useEffect(() => {
     if( !email || !password ) {
@@ -38,7 +39,8 @@ export default function Login() {
             const data = await response.json();
             console.log(data)
             if (data.token) {
-              //navigation.navigate("Profile");
+              signIn(JSON.stringify(data));
+              router.replace('/');
             } else {
               setError("Usuario o contraseña incorrectos");
             }
@@ -82,6 +84,12 @@ export default function Login() {
         >
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
+        <Text
+          onPress={() => {
+            router.replace('/register');
+          }}>
+          Crea tu cuenta clickeando aqui
+        </Text>
         {error && <Text style={styles.error}>{error}</Text>}
       </View>
     </View>

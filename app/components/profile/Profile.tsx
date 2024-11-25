@@ -19,7 +19,7 @@ interface ProfileProps {
   currentUserId: string;
 }
 
-const BASE_URL = "http://10.13.27.128:3001";
+const BASE_URL = "http://192.168.1.8:3001";
 
 const Profile: React.FC<ProfileProps> = ({ userId, token, currentUserId }) => {
   const [user, setUser] = useState<{
