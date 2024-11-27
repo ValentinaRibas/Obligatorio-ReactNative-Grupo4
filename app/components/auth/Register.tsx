@@ -8,7 +8,7 @@ import {
   TextInput,
 } from "react-native";
 import { router } from 'expo-router';
-import { useSession } from "../context/ctx";
+import { useSession, API_URL } from "../context/ctx";
 
 
 export default function Register() {
@@ -30,7 +30,7 @@ export default function Register() {
   const handleRegister = async () => {
     if (email && password && username) {
         try {
-          const response = await fetch("http://192.168.1.8:3001/api/auth/register", {
+          const response = await fetch(`${API_URL}/api/auth/register`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -40,7 +40,6 @@ export default function Register() {
           if (response.ok) {
             const data = await response.json();
             if (data.token) {
-              console.log(data);
               signIn(JSON.stringify(data));
               router.replace('/');
             } else {

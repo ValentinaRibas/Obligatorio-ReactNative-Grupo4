@@ -10,12 +10,9 @@ interface User {
 }
 
 export default function ScreenProfile() {
-  const {
-    profile,
-  } = useLocalSearchParams<{ profile?: string }>();
-
+  const { profile } = useLocalSearchParams<{ profile?: string }>();
   const { session } = useSession();
-
+  const [targetProfile, setTargetProfile] = useState<string>("");
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
@@ -25,9 +22,17 @@ export default function ScreenProfile() {
     }
   }, [session]);
 
+  useEffect(() => {
+    if (profile) {
+      setTargetProfile(profile);
+    } else {
+      setTargetProfile(user?._id ?? "");
+    }
+  }, [user]);
+
   return (
     <View style={{ flex: 1 }}>
-      {user && <Profile userId={user._id} token={user.token} currentUserId={profile || user._id} />}
+      {user && <Profile userId={user._id} token={user.token} currentUserId={targetProfile} />}
     </View>
   );
 };

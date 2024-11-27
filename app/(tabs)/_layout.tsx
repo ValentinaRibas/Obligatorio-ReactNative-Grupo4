@@ -9,11 +9,7 @@ export const unstable_settings = {
 };
 
 export default function AppLayout() {
-  const { session, isLoading } = useSession();
-
-  if (isLoading) {
-    return <Text>Loading...</Text>;
-  }
+  const { session } = useSession();
 
   if (!session) {
     return <Redirect href="/login" />;
@@ -24,7 +20,7 @@ export default function AppLayout() {
         <Tabs.Screen
           name="upload"
           options={{
-            title: 'Create post',
+            title: 'New Post',
             headerShown: false,
             tabBarIcon: ({ color }) => <FontAwesome size={28} name="plus" color={color} />,
           }}
@@ -43,11 +39,26 @@ export default function AppLayout() {
                 href: {
                 pathname: '/profile',
                 params: {
-                    profile: undefined,
+                    id: undefined,
                 },
             },
             headerShown: false,
             tabBarIcon: ({ color }) => <FontAwesome size={28} name="user" color={color} />,
+        }}/>
+        <Tabs.Screen 
+          name="post" 
+          options={{
+            title: 'Post',
+            headerShown: false,
+            href: null,
+            tabBarIcon: ({ color }) => <FontAwesome size={28} name="image" color={color} />,
+        }}/>
+        <Tabs.Screen 
+          name="notifications" 
+          options={{
+            title: 'Notifications',
+            headerShown: false,
+            tabBarIcon: ({ color }) => <FontAwesome size={28} name="bell" color={color} />,
         }}/>
       </Tabs>
   );
