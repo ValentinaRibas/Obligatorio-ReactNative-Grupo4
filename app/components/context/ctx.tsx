@@ -25,6 +25,8 @@ export function useSession() {
   return value;
 }
 
+export const API_URL = 'http://192.168.1.8:3001';
+
 export function SessionProvider({ children }: PropsWithChildren) {
   const [[isLoading, session], setSession] = useStorageState('session');
 

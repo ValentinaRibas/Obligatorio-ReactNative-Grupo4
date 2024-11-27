@@ -40,7 +40,6 @@ export default function Register() {
           if (response.ok) {
             const data = await response.json();
             if (data.token) {
-              console.log(data);
               signIn(JSON.stringify(data));
               router.replace('/');
             } else {

@@ -34,7 +34,6 @@ export default function Upload() {
             data.append('caption', caption);
         }
       
-        console.log(data);
         return data;
       };
       

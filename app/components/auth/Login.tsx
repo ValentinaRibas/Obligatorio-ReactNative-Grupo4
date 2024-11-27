@@ -37,7 +37,6 @@ export default function Login() {
           });
           if (response.ok) {
             const data = await response.json();
-            console.log(data)
             if (data.token) {
               signIn(JSON.stringify(data));
               router.replace('/');

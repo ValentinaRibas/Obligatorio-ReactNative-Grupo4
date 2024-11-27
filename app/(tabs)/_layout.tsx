@@ -43,11 +43,18 @@ export default function AppLayout() {
                 href: {
                 pathname: '/profile',
                 params: {
-                    profile: undefined,
+                    id: undefined,
                 },
             },
             headerShown: false,
             tabBarIcon: ({ color }) => <FontAwesome size={28} name="user" color={color} />,
+        }}/>
+        <Tabs.Screen 
+          name="post" 
+          options={{
+            title: 'Post',
+            headerShown: false,
+            tabBarIcon: ({ color }) => <FontAwesome size={28} name="image" color={color} />,
         }}/>
       </Tabs>
   );

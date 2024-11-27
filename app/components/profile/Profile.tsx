@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { router } from "expo-router";
 import {
   View,
   Text,
@@ -188,8 +189,12 @@ const Profile: React.FC<ProfileProps> = ({ userId, token, currentUserId }) => {
   };
 
   const handleOpenModal = (post: (typeof photos)[0]) => {
+    router.push({
+      pathname: `/post`,
+      params: { id: post.id },
+    });
     setSelectedPost(post);
-    setIsModalOpen(true);
+    
   };
 
   const handleCloseModal = () => {
@@ -310,26 +315,6 @@ const Profile: React.FC<ProfileProps> = ({ userId, token, currentUserId }) => {
           return null;
         }}
       />
-
-      <Modal visible={isModalOpen} transparent={true}>
-        <View style={styles.modalContainer}>
-          <TouchableOpacity
-            onPress={handleCloseModal}
-            style={styles.modalCloseButton}
-          >
-            <Text style={styles.modalCloseText}>Close</Text>
-          </TouchableOpacity>
-          {selectedPost && (
-            <View>
-              <Image
-                source={{ uri: selectedPost.imageUrl }}
-                style={styles.modalImage}
-              />
-              <Text>{selectedPost.caption}</Text>
-            </View>
-          )}
-        </View>
-      </Modal>
     </View>
   );
 };
