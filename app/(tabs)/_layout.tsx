@@ -54,6 +54,7 @@ export default function AppLayout() {
           options={{
             title: 'Post',
             headerShown: false,
+            href: null,
             tabBarIcon: ({ color }) => <FontAwesome size={28} name="image" color={color} />,
         }}/>
       </Tabs>
