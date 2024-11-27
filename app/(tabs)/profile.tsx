@@ -28,7 +28,7 @@ export default function ScreenProfile() {
     } else {
       setTargetProfile(user?._id ?? "");
     }
-  }, [user]);
+  }, [user, profile]);
 
   return (
     <View style={{ flex: 1 }}>
