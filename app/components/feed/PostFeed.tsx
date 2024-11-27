@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { router } from 'expo-router';
 import { Text, View, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { useSession, API_URL } from '../context/ctx';
 import Post from './Post';
@@ -29,6 +30,7 @@ export default function PostFeed() {
           comments: post.comments,
           likes: post.likes,
         }));
+        console.log(postFound)
         setPosts(postFound);
       } else {
         console.error("Error fetching posts");
@@ -43,17 +45,30 @@ export default function PostFeed() {
   }, []);
 
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
+      <TouchableOpacity onPress={fetchPosts} style={styles.button}>
+        <Text style={styles.text}>
+          Recargar Feed
+        </Text>
+      </TouchableOpacity>
       {
-        posts && posts.map((post: any, index: number) => {
-          return (
-            <View key={index} style={styles.card}>
-                <Post post={post} key={index} />
-            </View>
-          );
-        })
+        posts && posts.length > 0 ?
+        <ScrollView>
+          {
+            posts.map((post: any, index: number) => {
+              return (
+                <View key={index} style={styles.card}>
+                  <Post post={post} />
+                </View>
+              );
+            })
+          }
+        </ScrollView> :
+        <TouchableOpacity onPress={() => router.push('/upload')} style={styles.button}>
+          <Text style={styles.text}>No hay posts, click para subir uno</Text>
+        </TouchableOpacity>
       }
-    </ScrollView>
+    </View>
   );
 }
 
@@ -62,9 +77,19 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: "#fff",
     borderRadius: 10,
+    height: "100%",
   },
   card: {
     padding: 10,
     marginBottom: 10,
   },
+  button: {
+    padding: 10,
+    backgroundColor: "#0070F3",
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  text: {
+    color: "#fff"
+  }
 });

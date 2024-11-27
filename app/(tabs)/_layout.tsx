@@ -9,11 +9,7 @@ export const unstable_settings = {
 };
 
 export default function AppLayout() {
-  const { session, isLoading } = useSession();
-
-  if (isLoading) {
-    return <Text>Loading...</Text>;
-  }
+  const { session } = useSession();
 
   if (!session) {
     return <Redirect href="/login" />;

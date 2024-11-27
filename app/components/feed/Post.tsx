@@ -50,7 +50,7 @@ export default function Post({ post }: { post: any }) {
         </TouchableOpacity>
         <View style={styles.likeSection}>
             <LikePost post={post} />
-            <Text style={styles.postContentText}>{"Título: " + post.caption}</Text>
+            <Text style={styles.postContentText}>{"Descripción: " + post.caption}</Text>
         </View>
         <View style={styles.commentbox}>
             <CreateCommentInput post={post}/>

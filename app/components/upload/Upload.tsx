@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
+import { router } from 'expo-router';
 import { TextInput, Text, View, Image, StyleSheet, Alert, TouchableOpacity, Platform } from 'react-native';
 import * as ImagePicker from "expo-image-picker";
 import { useSession, API_URL } from '../context/ctx';
-import symbolicateStackTrace from 'react-native/Libraries/Core/Devtools/symbolicateStackTrace';
   
 export default function Upload() {
     const [postPic, setPostPic] = useState("");
     const [caption, setCaption] = useState("");
     const [file, setFile] = useState<ImagePicker.ImagePickerAsset | null>(null);
+    const [postId, setPostId] = useState<string>("");
     const { session } = useSession();
     const user = session ? JSON.parse(session) : null;
 
@@ -41,10 +42,10 @@ export default function Upload() {
 
     const handleImagePicker = async () => {
         try {
-            const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+            const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync()
             if (!permissionResult.granted) {
-                Alert.alert("Permission to access camera roll is required!");
-                return;
+                Alert.alert("Permission to access camera roll is required!")
+                return
             }
 
             const pickerResult = await ImagePicker.launchImageLibraryAsync({
@@ -55,11 +56,11 @@ export default function Upload() {
             });
 
             if (!pickerResult.canceled) {
-                setPostPic(pickerResult.assets[0].uri);
-                setFile(pickerResult.assets[0]);
+                setPostPic(pickerResult.assets[0].uri)
+                setFile(pickerResult.assets[0])
             }
         } catch (error) {
-            console.error("Error opening gallery:", error);
+            console.error("Error opening gallery:", error)
         }
     };
     const handleSubmit = async () => {
@@ -73,13 +74,18 @@ export default function Upload() {
             });
 
             if (response.ok) {
-                const data = await response.json();
+                const data = await response.json()
+                if(data?._id) {
+                    setPostId(data._id)
+                    setPostPic("")
+                    setCaption("")
+                }
                 console.log(data);
             } else {
-                console.error("Error al crear el post");
+                console.error("Error al crear el post")
             }
         } catch (error) {
-            console.error("Error al crear el post:", error);
+            console.error("Error al crear el post:", error)
         }
     };
   return (
@@ -105,6 +111,11 @@ export default function Upload() {
         <TouchableOpacity onPress={handleSubmit} style={styles.submitButton}>
           <Text style={styles.submitButtonText}>Crear</Text>
         </TouchableOpacity>
+        {
+            postId && <TouchableOpacity onPress={() => router.push(`/post?id=${postId}`)} style={styles.submitButton}>
+              <Text style={styles.submitButtonText}>Ver post</Text>
+            </TouchableOpacity>
+        }
     </View>
   );
 }

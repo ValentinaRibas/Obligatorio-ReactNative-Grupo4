@@ -26,7 +26,6 @@ export default function ScreenProfile() {
     if (profile) {
       setTargetProfile(profile);
     } else {
-      console.log(user);
       setTargetProfile(user?._id ?? "");
     }
   }, [user]);
