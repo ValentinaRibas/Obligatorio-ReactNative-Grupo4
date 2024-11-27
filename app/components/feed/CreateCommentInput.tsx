@@ -1,17 +1,18 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Text, View, Image, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
 import { useSession, API_URL } from '../context/ctx';
+import PostComments from './PostComments';
 
-export default function CreateCommentInput({ post }: { post: any }) {
+export default function CreateCommentInput({ post }: { post:any }) {
 
     const { session } = useSession();
     const user = session ? JSON.parse(session) : null;
     const token = user ? user.token : null;
+    const [postComments, setPostComments] = useState<string[]>([]);
 
     const [text, setText] = useState("");
 
     const handleSubmit = async () => {
-        console.log(post);
         try {
             const response = await fetch(`${API_URL}/api/posts/${post.id}/comments`, {
                 method: "POST",
@@ -23,7 +24,12 @@ export default function CreateCommentInput({ post }: { post: any }) {
             });
             if (response.ok) {
                 const data = await response.json();
-                console.log(data);
+                data.user = {
+                    _id: user._id,
+                    username: user.username
+                }
+                setPostComments([...postComments, data]);
+                setText("");
             } else {
                 console.error("Error al enviar comentario");
             }
@@ -32,8 +38,15 @@ export default function CreateCommentInput({ post }: { post: any }) {
         }
     };
 
+    useEffect(() => {
+        if (post.comments) {
+            setPostComments(post.comments);
+        }
+    },  [post]);
+
     return (
         <View style={styles.container}>
+            { postComments && postComments.length > 0 && <PostComments comments={postComments} /> }
             <View>
                 <TextInput
                     style={styles.input}
@@ -58,6 +71,7 @@ export default function CreateCommentInput({ post }: { post: any }) {
 
 const styles = StyleSheet.create({
     container: {
+        height: 300,
         padding: 10,
     },
     input: {

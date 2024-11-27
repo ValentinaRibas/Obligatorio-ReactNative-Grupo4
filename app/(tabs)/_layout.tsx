@@ -24,7 +24,7 @@ export default function AppLayout() {
         <Tabs.Screen
           name="upload"
           options={{
-            title: 'Create post',
+            title: 'New Post',
             headerShown: false,
             tabBarIcon: ({ color }) => <FontAwesome size={28} name="plus" color={color} />,
           }}

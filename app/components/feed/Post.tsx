@@ -1,36 +1,59 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { router } from 'expo-router';
 import { Text, View, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { useSession } from '../context/ctx';
-import PostComments from './PostComments';
 import CreateCommentInput from './CreateCommentInput';
 import LikePost from './LikePost';
+import PostHeader from './PostHeader';
 
 export default function Post({ post }: { post: any }) {
   const { session } = useSession();
   const user = session ? JSON.parse(session) : null;
+  const [setComment, setComments] = useState<any[]>([]);
+
+  const redirectToPost = () => {
+    router.push({
+      pathname: `/post`,
+      params: { id: post.id },
+    });
+  };
+
+  const redirectToProfile = () => {
+    router.push({
+      pathname: `/profile`,
+      params: { profile: post.userId },
+    });
+  };
+
 
   return (
     <View style={styles.container}>
       <View style={styles.post}>
-        <View style={styles.postImage}>
-          <Image
-            source={{
-              uri:
-                post.image ||
-                "https://via.placeholder.com/150",
-            }}
-            style={styles.postImage}
-          />
-        </View>
+        {post && post.userId && post.userId !== user?._id ? (
+          <TouchableOpacity onPress={redirectToProfile}>
+            <PostHeader post={post} />
+          </TouchableOpacity>
+        ) : (
+          null
+        )}
+        <TouchableOpacity onPress={redirectToPost}>
+          <View style={styles.postImage}>
+            <Image
+              source={{
+                uri:
+                  post.image ||
+                  "https://via.placeholder.com/150",
+              }}
+              style={styles.postImage}
+            />
+          </View>
+        </TouchableOpacity>
         <View style={styles.likeSection}>
             <LikePost post={post} />
             <Text style={styles.postContentText}>{"Título: " + post.caption}</Text>
         </View>
-        <View style={styles.comment}>
-            <PostComments post={post} />
-        </View>
         <View style={styles.commentbox}>
-            <CreateCommentInput post={post} />
+            <CreateCommentInput post={post}/>
         </View>
         <View style={styles.postContent}>
           <Text style={styles.postContentText}>{post.createdAt}</Text>
@@ -43,7 +66,7 @@ export default function Post({ post }: { post: any }) {
 const styles = StyleSheet.create({
   container: {
     width: "100%",
-    height: "auto",
+    height: 680,
     borderRadius: 10,
     backgroundColor: "#fff",
     shadowColor: "#000",
@@ -56,11 +79,12 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   post: {
+    height: "100%",
     padding: 10,
   },
   postImage: {
     width: "100%",
-    height: 200,
+    height: 150,
     borderRadius: 10,
   },
   postContent: {
@@ -81,7 +105,7 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   commentbox: {
-    padding: 20,
+    padding: 10,
   },
   likeSection: {
     display: "flex",
@@ -89,5 +113,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "100%",
     marginTop: 10,
-  }
+  },
+  profileImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 50,
+    marginBottom: 10,
+  },
 });

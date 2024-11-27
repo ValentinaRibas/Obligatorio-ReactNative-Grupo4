@@ -13,6 +13,8 @@ import {
   Dimensions,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
+import { API_URL, useSession } from "../context/ctx";
+import AddFriend from "./AddFriend";
 
 interface ProfileProps {
   userId: string;
@@ -20,16 +22,16 @@ interface ProfileProps {
   currentUserId: string;
 }
 
-const BASE_URL = "http://192.168.1.8:3001";
-
 const Profile: React.FC<ProfileProps> = ({ userId, token, currentUserId }) => {
+  const { signOut } = useSession();
+
   const [user, setUser] = useState<{
     _id: string;
     username: string;
     description: string;
     profilePicture: string;
     posts: string[];
-    friends: string[];
+    friends: any[];
   } | null>(null);
 
   const [photos, setPhotos] = useState<
@@ -48,10 +50,6 @@ const Profile: React.FC<ProfileProps> = ({ userId, token, currentUserId }) => {
   const [username, setUsername] = useState("");
   const [description, setDescription] = useState("");
   const [profilePic, setProfilePic] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedPost, setSelectedPost] = useState<(typeof photos)[0] | null>(
-    null
-  );
 
   const numColumns = 3;
   const { width } = Dimensions.get("window");
@@ -61,7 +59,7 @@ const Profile: React.FC<ProfileProps> = ({ userId, token, currentUserId }) => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await fetch(`${BASE_URL}/api/user/profile/${userId}`, {
+        const response = await fetch(`${API_URL}/api/user/profile/${currentUserId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -71,7 +69,7 @@ const Profile: React.FC<ProfileProps> = ({ userId, token, currentUserId }) => {
           setUser({
             ...data.user,
             posts: data.posts.length,
-            friends: data.user.friends.length,
+            friends: data.user.friends,
           });
           setUsername(data.user.username);
           setDescription(data.user.description);
@@ -84,7 +82,7 @@ const Profile: React.FC<ProfileProps> = ({ userId, token, currentUserId }) => {
 
     const fetchUserPosts = async () => {
       try {
-        const response = await fetch(`${BASE_URL}/api/posts/feed`, {
+        const response = await fetch(`${API_URL}/api/posts/feed`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -92,11 +90,11 @@ const Profile: React.FC<ProfileProps> = ({ userId, token, currentUserId }) => {
         if (response.ok) {
           const data = await response.json();
           const userPosts = data.filter(
-            (post: any) => post.user._id === userId
+            (post: any) => post.user._id === currentUserId
           );
           const imageUrls = userPosts.map((post: any) => ({
             id: post._id,
-            imageUrl: `${BASE_URL}/${post.imageUrl}`,
+            imageUrl: `${API_URL}/${post.imageUrl}`,
             caption: post.caption,
             likes: post.likes.length,
             comments: post.comments.length,
@@ -130,7 +128,7 @@ const Profile: React.FC<ProfileProps> = ({ userId, token, currentUserId }) => {
     };
 
     try {
-      const response = await fetch(`${BASE_URL}/api/user/profile/edit`, {
+      const response = await fetch(`${API_URL}/api/user/profile/edit`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -193,13 +191,6 @@ const Profile: React.FC<ProfileProps> = ({ userId, token, currentUserId }) => {
       pathname: `/post`,
       params: { id: post.id },
     });
-    setSelectedPost(post);
-    
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedPost(null);
   };
 
   if (!user) return <Text>Loading...</Text>;
@@ -245,13 +236,14 @@ const Profile: React.FC<ProfileProps> = ({ userId, token, currentUserId }) => {
             <Text style={styles.bold}>{user.posts || 0}</Text> Posts
           </Text>
           <Text style={styles.stat}>
-            <Text style={styles.bold}>{user.friends || 0}</Text> Friends
+            <Text style={styles.bold}>{user.friends.length || 0}</Text> Friends
           </Text>
         </View>
       </View>
 
       {userId === currentUserId ? (
-        <TouchableOpacity
+        <View>
+          <TouchableOpacity
           style={styles.editButton}
           onPress={isEditing ? handleSaveClick : handleEditClick}
         >
@@ -259,15 +251,17 @@ const Profile: React.FC<ProfileProps> = ({ userId, token, currentUserId }) => {
             {isEditing ? "Save" : "Edit Profile"}
           </Text>
         </TouchableOpacity>
-      ) : (
         <TouchableOpacity
           style={styles.editButton}
-          onPress={() => {
-            Alert.alert("Friend request sent!");
-          }}
+          onPress={signOut}
         >
-          <Text style={styles.editButtonText}>Add Friend</Text>
+          <Text style={styles.editButtonText}>
+            Log out
+          </Text>
         </TouchableOpacity>
+        </View>
+      ) : (
+        <AddFriend userId={currentUserId} friends={user.friends} />
       )}
 
       <FlatList

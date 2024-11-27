@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { TextInput, Text, View, Image, StyleSheet, Alert, TouchableOpacity, Platform } from 'react-native';
 import * as ImagePicker from "expo-image-picker";
 import { useSession, API_URL } from '../context/ctx';
+import symbolicateStackTrace from 'react-native/Libraries/Core/Devtools/symbolicateStackTrace';
   
 export default function Upload() {
     const [postPic, setPostPic] = useState("");
@@ -82,7 +83,8 @@ export default function Upload() {
         }
     };
   return (
-    <View>
+    <View style={styles.container}>
+        <Text style={styles.title}>Crea un nuevo post:</Text>
         <TouchableOpacity onPress={handleImagePicker}>
             <Image
               source={{
@@ -95,23 +97,49 @@ export default function Upload() {
         </TouchableOpacity>
         <TextInput
           style={{ height: 40, borderWidth: 1, borderColor: "#ccc", padding: 8, marginVertical: 5, width: "100%" }}
-          placeholder="Caption"
+          placeholder="Descripción"
           placeholderTextColor="#C4C4C4"
           onChangeText={setCaption}
           value={caption}
         />
-        <TouchableOpacity onPress={handleSubmit}>
-          <Text>Submit</Text>
+        <TouchableOpacity onPress={handleSubmit} style={styles.submitButton}>
+          <Text style={styles.submitButtonText}>Crear</Text>
         </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-    profileImage: {
-        width: 100,
-        height: 100,
-        borderRadius: 50,
+    container: {
+        marginTop: "30%",
+        padding: 10,
+        borderBlockColor: "#ccc",
+        borderRadius: 10,
+    },
+    title: {
+        fontSize: 24,
+        fontWeight: "bold",
         marginBottom: 10,
+    },
+    profileImage: {
+        width: "100%",
+        height: 150,
+        borderRadius: 10,
+        marginBottom: 10,
+    },
+    submitButton: {
+        marginTop: 20,
+        width: "100%",
+        height: 48,
+        borderRadius: 8,
+        backgroundColor: "#0070F3",
+        justifyContent: "center",
+        alignItems: "center",
+        marginBottom: 24,
+    },
+    submitButtonText: {
+        color: "#fff",
+        fontSize: 16,
+        fontWeight: "bold",
     },
 });

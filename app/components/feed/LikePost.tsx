@@ -26,7 +26,6 @@ export default function LikePost({ post }: { post: any }) {
             });
             if (response.ok) {
                 const data = await response.json();
-                console.log(data);
                 setLiked(!liked);
             } else {
                 console.error("Error al enviar like", response);
@@ -49,7 +48,6 @@ export default function LikePost({ post }: { post: any }) {
     };
 
     useEffect(() => {
-        console.log(post.likes);
         findIfLiked();
     }, [post]);
 
