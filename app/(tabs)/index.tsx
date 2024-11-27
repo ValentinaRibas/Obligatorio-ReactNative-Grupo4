@@ -1,18 +1,12 @@
 import React, { useState } from 'react';
 import { Text, View } from 'react-native';
 import { useSession } from '../components/context/ctx';
+import PostFeed from '../components/feed/PostFeed';
 export default function HomeScreen() {
-
-  const { signOut } = useSession();
 
   return (
     <View>
-      <Text
-        onPress={() => {
-          signOut();
-        }}>
-        Sign Out
-      </Text>
+      <PostFeed />
     </View>
   );
 }

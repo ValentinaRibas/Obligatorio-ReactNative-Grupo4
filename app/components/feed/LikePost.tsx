@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Text, View, Image, StyleSheet, TouchableOpacity } from 'react-native';
-import { useSession } from '../context/ctx';
+import { useSession, API_URL } from '../context/ctx';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 
@@ -13,7 +13,7 @@ export default function LikePost({ post }: { post: any }) {
     const [liked, setLiked] = useState(false);
 
     const handleLike = async () => {
-        const likedEdnpoint = `http://192.168.1.8:3001/api/posts/${post.id}/like`;
+        const likedEdnpoint = `${API_URL}/api/posts/${post.id}/like`;
         const method = liked ? "DELETE" : "POST";
         
         try {
@@ -68,6 +68,7 @@ export default function LikePost({ post }: { post: any }) {
 const styles = StyleSheet.create({
     container: {
         padding: 10,
+        width: "20%",
     },
     button: {
         width: "100%",

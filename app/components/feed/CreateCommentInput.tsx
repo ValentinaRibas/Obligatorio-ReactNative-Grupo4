@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Text, View, Image, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
-import { useSession } from '../context/ctx';
+import { useSession, API_URL } from '../context/ctx';
 
 export default function CreateCommentInput({ post }: { post: any }) {
 
@@ -13,7 +13,7 @@ export default function CreateCommentInput({ post }: { post: any }) {
     const handleSubmit = async () => {
         console.log(post);
         try {
-            const response = await fetch(`http://192.168.1.8:3001/api/posts/${post.id}/comments`, {
+            const response = await fetch(`${API_URL}/api/posts/${post.id}/comments`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -29,7 +29,6 @@ export default function CreateCommentInput({ post }: { post: any }) {
             }
         } catch (error) {
             console.error("Error al enviar comentario:", error);
-            
         }
     };
 

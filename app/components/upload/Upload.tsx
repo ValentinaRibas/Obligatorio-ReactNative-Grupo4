@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { TextInput, Text, View, Image, StyleSheet, Alert, TouchableOpacity, Platform } from 'react-native';
 import * as ImagePicker from "expo-image-picker";
-import { useSession } from '../context/ctx';
+import { useSession, API_URL } from '../context/ctx';
   
 export default function Upload() {
     const [postPic, setPostPic] = useState("");
@@ -63,7 +63,7 @@ export default function Upload() {
     };
     const handleSubmit = async () => {
         try {
-            const response = await fetch("http://192.168.1.8:3001/api/posts/upload", {
+            const response = await fetch(`${API_URL}/api/posts/upload`, {
                 method: "POST",
                 headers: {
                     "Authorization": `Bearer ${user.token}`

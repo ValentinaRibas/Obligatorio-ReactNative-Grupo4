@@ -24,6 +24,7 @@ export default function Post({ post }: { post: any }) {
         </View>
         <View style={styles.likeSection}>
             <LikePost post={post} />
+            <Text style={styles.postContentText}>{"Título: " + post.caption}</Text>
         </View>
         <View style={styles.comment}>
             <PostComments post={post} />
@@ -32,7 +33,6 @@ export default function Post({ post }: { post: any }) {
             <CreateCommentInput post={post} />
         </View>
         <View style={styles.postContent}>
-          <Text style={styles.postContentText}>{post.caption}</Text>
           <Text style={styles.postContentText}>{post.createdAt}</Text>
         </View>
       </View>
@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
   },
   postImage: {
     width: "100%",
-    height: 300,
+    height: 200,
     borderRadius: 10,
   },
   postContent: {
@@ -69,12 +69,6 @@ const styles = StyleSheet.create({
   postContentText: {
     fontSize: 16,
     fontWeight: "bold",
-  },
-  deleteButton: {
-    backgroundColor: "#000",
-    padding: 10,
-    borderRadius: 10,
-    marginTop: 10,
   },
   comment: {
     padding: 10,
@@ -90,6 +84,10 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   likeSection: {
-    width: "20%",
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    width: "100%",
+    marginTop: 10,
   }
 });

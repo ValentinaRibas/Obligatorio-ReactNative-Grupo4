@@ -8,7 +8,7 @@ import {
   TextInput,
 } from "react-native";
 import { router } from 'expo-router';
-import { useSession } from "../context/ctx";
+import { useSession, API_URL } from "../context/ctx";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -28,7 +28,7 @@ export default function Login() {
   const handleLogin = async () => {
     if (email && password) {
         try {
-          const response = await fetch("http://192.168.1.8:3001/api/auth/login", {
+          const response = await fetch(`${API_URL}/api/auth/login`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
