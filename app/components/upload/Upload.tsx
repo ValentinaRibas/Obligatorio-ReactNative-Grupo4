@@ -113,7 +113,7 @@ export default function Upload() {
         </TouchableOpacity>
         {
             postId && <TouchableOpacity onPress={() => router.push(`/post?id=${postId}`)} style={styles.submitButton}>
-              <Text style={styles.submitButtonText}>Ver post</Text>
+              <Text style={styles.submitButtonText}>Ver ultimo post</Text>
             </TouchableOpacity>
         }
     </View>
