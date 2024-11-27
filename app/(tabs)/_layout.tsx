@@ -53,6 +53,13 @@ export default function AppLayout() {
             href: null,
             tabBarIcon: ({ color }) => <FontAwesome size={28} name="image" color={color} />,
         }}/>
+        <Tabs.Screen 
+          name="notifications" 
+          options={{
+            title: 'Notifications',
+            headerShown: false,
+            tabBarIcon: ({ color }) => <FontAwesome size={28} name="bell" color={color} />,
+        }}/>
       </Tabs>
   );
 }
